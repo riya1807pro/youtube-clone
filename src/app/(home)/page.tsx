@@ -1,11 +1,17 @@
 // "use client";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <div>
-      <Image src="/youtubeLogo.svg" alt="logo" width={50} height={50} />
-      <p className="text-xl font-semibold  tracking-tight">Youtube</p>
+ i will upload my videoss soon
+
+ <Link href={"/auth/sign-in/sign-in"}>
+ <button>
+  signIn
+ </button>
+ </Link>
     </div>
   );
 }

@@ -7,29 +7,31 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { FlagIcon, HomeIcon, PlaySquareIcon } from "lucide-react";
+import { FlagIcon, HistoryIcon, HomeIcon, ListVideoIcon, PlaySquareIcon, ThumbsUpIcon } from "lucide-react";
 import Link from "next/link";
 
 export const items = [
   {
-    title: "Home",
-    url: "/",
-    icon: HomeIcon,
+    title: "History",
+    url: "/history",
+    icon: HistoryIcon,
+    auth:true
   },
   {
-    title: "Subscrition",
-    url: "/feed/subscription",
-    icon: PlaySquareIcon,
+    title: "Liked",
+    url: "/playlists/Liked",
+    icon: ThumbsUpIcon,
     auth: true,
   },
   {
-    title: "Trending",
-    url: "/feed/trending",
-    icon: FlagIcon,
+    title: "All Playlists",
+    url: "/palylists",
+    icon: ListVideoIcon,
+    auth:true
   },
 ];
 
-export const Main_Section = () => {
+export const Personal_Section = () => {
   return (
     <SidebarGroup>
       <SidebarGroupContent>
@@ -49,7 +51,7 @@ export const Main_Section = () => {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-        
+      
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
