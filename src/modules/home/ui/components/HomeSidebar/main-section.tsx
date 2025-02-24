@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { FlagIcon, HomeIcon, PlaySquareIcon } from "lucide-react";
 import Link from "next/link";
+import { useClerk, useAuth } from "@clerk/nextjs";
 
 export const items = [
   {
@@ -30,6 +31,8 @@ export const items = [
 ];
 
 export const Main_Section = () => {
+  const clerk = useClerk();
+  const { isSignedIn } = useAuth();
   return (
     <SidebarGroup>
       <SidebarGroupContent>
@@ -40,7 +43,12 @@ export const Main_Section = () => {
                 tooltip={item.title}
                 asChild
                 isActive
-                onClick={() => {}}
+                onClick={(e) => {
+                  if (item.auth && !isSignedIn) {
+                    e.preventDefault();
+                    return clerk.openSignIn();
+                  }
+                }}
               >
                 <Link href={item.url} className="flex items-center gap-4">
                   <item.icon />
@@ -49,7 +57,6 @@ export const Main_Section = () => {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
-        
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
