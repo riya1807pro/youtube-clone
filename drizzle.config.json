@@ -1,0 +1,23 @@
+{
+  "contracts": [
+    {
+      "contractName": "MyContract",
+      "abi": "path/to/contract/abi.json",
+      "address": "0xYourContractAddressHere",
+      "networkId": "1",
+      "events": {
+        "EventName": {
+          "topics": []
+        }
+      }
+    }
+  ],
+  "web3": {
+    "blockchain": "mainnet",
+    "infuraId": "your-infura-id-here"
+  },
+  "drizzleOptions": {
+    "pollingInterval": 10000,
+    "networkId": 1
+  }
+}
