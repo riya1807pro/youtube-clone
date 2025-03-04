@@ -1,16 +1,19 @@
-import { initTRPC } from "@trpc/server";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { auth } from "@clerk/nextjs/server";
+import { initTRPC, TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
 import { cache } from "react";
 export const createTRPCContext = cache(async () => {
-  /**
-   * @see: https://trpc.io/docs/server/context
-   */
-  return { userId: "user_123" };
+  const { userId } = await auth();
+  return { clerkUserId: userId };
 });
+export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
 // For instance, the use of a t variable
 // is common in i18n libraries.
-const t = initTRPC.create({
+const t = initTRPC.context<Context>().create({
   /**
    * @see https://trpc.io/docs/server/data-transformers
    */
@@ -20,3 +23,28 @@ const t = initTRPC.create({
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
+export const ProtectedProcedure = t.procedure.use(async function isAuthed(
+  opts
+) {
+  const { ctx } = opts;
+  if (!ctx.clerkUserId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerk_Id, ctx.clerkUserId))
+    .limit(1);
+
+  if (!user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return opts.next({
+    ctx: {
+      ...ctx,
+      user,
+    },
+  });
+});
