@@ -6,7 +6,7 @@ export const appRouter = createTRPCRouter({
       text: z.string(),
     })
   ).query((opts) => {
-    console.log({ fromContext: opts.ctx.user });
+    console.log({ dbUser: opts.ctx.userId });
     return {
       greeting: `hello ${opts.input.text}`,
     };

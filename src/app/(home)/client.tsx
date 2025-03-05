@@ -1,5 +1,4 @@
 "use client";
-
 import { trpc } from "@/trpc/client";
 export default function PageClient() {
   // Using TRPC's useSuspenseQuery hook to fetch data

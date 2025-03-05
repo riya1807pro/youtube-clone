@@ -1,12 +1,13 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
+import { ratelimit } from "@/lib/ratelimit";
 import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { cache } from "react";
 export const createTRPCContext = cache(async () => {
   const { userId } = await auth();
-  return { clerkUserId: userId };
+  return { clerkUserId: { userId } };
 });
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 // Avoid exporting the entire t-object
@@ -30,21 +31,34 @@ export const ProtectedProcedure = t.procedure.use(async function isAuthed(
   if (!ctx.clerkUserId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  const userId = ctx.clerkUserId?.userId;
 
-  const [user] = await db
-    .select()
-    .from(users)
-    .where(eq(users.clerk_Id, ctx.clerkUserId))
-    .limit(1);
+  if (userId) {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerk_Id, userId)) // Proceed only if userId is valid
+      .limit(1);
 
-  if (!user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    // if (!user) {
+    //   throw new TRPCError({ code: "UNAUTHORIZED" });
+    // }
+    console.log("User ID is valid.", user);
+
+    const { success } = await ratelimit.limit(userId);
+
+    if (!success) {
+      throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+    }
+  } else {
+    // Handle case where userId is null or undefined
+    console.log("User ID is null or undefined.");
   }
 
   return opts.next({
     ctx: {
       ...ctx,
-      user,
+      userId,
     },
   });
 });
