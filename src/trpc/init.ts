@@ -23,7 +23,8 @@ const t = initTRPC.context<Context>().create({
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
-export const baseProcedure = t.procedure;
+// export const baseProcedure = createTRPCRouter().procedure.input(z.object({}));
+export const baseProcedure = t.procedure; // Or other shared logic
 export const ProtectedProcedure = t.procedure.use(async function isAuthed(
   opts
 ) {
