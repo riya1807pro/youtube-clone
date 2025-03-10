@@ -5,7 +5,7 @@ interface PageProps {
 }
 // pages/index.tsx or your home page component
 
-import { HomeView } from "@/modules/home/ui/views/home-view";
+import HomeView from "@/modules/home/ui/views/home-view";
 import { trpc, HydrateClient } from "@/trpc/server";
 
 export const dynamic = "force-dynamic";
