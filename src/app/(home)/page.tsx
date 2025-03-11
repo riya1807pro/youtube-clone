@@ -1,6 +1,6 @@
 interface PageProps {
   searchParams: Promise<{
-    categoryId?: string;
+    categoryId: string;
   }>;
 }
 // pages/index.tsx or your home page component
