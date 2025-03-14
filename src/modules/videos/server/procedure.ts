@@ -5,12 +5,22 @@ import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 export const VideoRouter = createTRPCRouter({
     create: ProtectedProcedure.mutation(async ({ ctx }) => {
-      const { id: userId } = ctx.userId?.toString();
+      const userId = ctx.userId?.toString();
 
       const upload = await mux.video.uploads.create({
         new_asset_settings:{
           passthrough: userId,
           playback_policy: ["public"],
+          input: [
+            {
+              generated_subtitles:[
+                {
+                  language_code: "en",
+                  name:"English"
+                }
+              ]
+            }
+          ]
         },
         cors_origin:"*"
       })
