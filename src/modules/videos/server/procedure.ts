@@ -1,11 +1,24 @@
 import { db } from "@/db";
-import { videos } from "@/db/schema";
+import { users, videos } from "@/db/schema";
+import { mux } from "@/lib/mux";
 import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 export const VideoRouter = createTRPCRouter({
     create: ProtectedProcedure.mutation(async ({ ctx }) => {
-      const { userId } = ctx;
+      const { id: userId } = ctx.userId?.toString();
+
+      const upload = await mux.video.uploads.create({
+        new_asset_settings:{
+          passthrough: userId,
+          playback_policy: ["public"],
+        },
+        cors_origin:"*"
+      })
   
+      
+      console.log("Upload:", upload); // Log the upload to see if it's correctly populated
+      console.log("Upload URL:", upload.url); // Log the upload ID to see if it's correctly populated
+
       console.log("User ID:", userId); // Log the userId to see if it's correctly populated
       
       if (!userId) {
@@ -17,6 +30,12 @@ export const VideoRouter = createTRPCRouter({
           .insert(videos)
           .values({
             userId,
+            muxStatus:"waiting",
+            muxAssetId: upload.id,
+            muxUploaderId: upload.id,
+            muxPlaybackId: upload.id,
+            muxTrackId: upload.id,
+            muxTrackStatus: "waiting",
             title: "untitled",
           })
           .returning();

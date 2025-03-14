@@ -3,7 +3,6 @@
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { Table, TableHeader,TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { DEFAULT_VALUE } from "@/costant";
-import { videos } from "@/db/schema";
 import { trpc } from "@/trpc/client"
 import Link from "next/link";
 import { Suspense } from "react";
