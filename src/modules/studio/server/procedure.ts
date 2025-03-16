@@ -3,58 +3,81 @@ import {z} from "zod"
 import { videos } from "@/db/schema";
 import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
 import { eq ,or ,and, lt ,desc} from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 
 type id= {
     id : string| null
 }
 
 export const studioRouter =  createTRPCRouter({
-    getMany : ProtectedProcedure
-    .input(
-        z.object({
-            cursor: z.object({
-                id: z.string().uuid(),
-                updatedAt: z.date()
-            })
-            .nullish(),
-            limit: z.number().min(1).max(100)
-        })
-    )
-    .query(async({ctx,input})=>{
-        const { cursor, limit} = input;
-        const userId = ctx.userId;
-        if (!userId) {
-            throw new Error("User ID is required");
-        }
-         const data = await db
+    getOne: ProtectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+        const { id: userId } = ctx.userId;
+        const { id } = input;
+
+        const [video] = await db
         .select()
         .from(videos)
-        .where(and(eq(videos.userId,userId),
-    cursor
-    ? or(
-        lt(videos.updatedAt, cursor.updatedAt),
-        and(
-            eq(videos.updatedAt,cursor.updatedAt),
-            lt(videos.id,cursor.id)
-        )
-    ):undefined
-    )).orderBy(desc(videos.updatedAt,),desc(videos.id))
-    .limit(limit+1)
-//check if there is more data than limit
-    const hasMore = data.length> limit;
-    //remove the last items if more than limit
-    const items = hasMore  ? data.slice(0,-1): data;
-    // set next cursor to last item if there is more data
-    const lastItem = items[items.length-1]
-    const next_cursor = hasMore?
-    {
-        id: lastItem.id,
-        updatedAt: lastItem.updatedAt,
-    }:null
+        .where(and(
+            eq(videos.id, id),
+            eq(videos.userId, userId),
+        ));
 
-        return {
-            items,
-            next_cursor
-        };
-    })
+        if (!video) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Video not found' });
+        }
+
+        return  video;
+    }),
+  getMany: ProtectedProcedure
+  .input(
+      z.object({
+          cursor: z.object({
+              id: z.string().uuid(),
+              updatedAt: z.date(),
+          })
+          .nullish(),
+          limit: z.number().min(1).max(100),
+      }),
+  )
+  .query(async ({ ctx, input }) => {
+      const { cursor, limit } = input;
+      const { id : userId } = ctx.userId;
+
+      const data = await db
+      .select()
+      .from(videos)
+      .where(and(
+          eq(videos.userId, userId),
+          cursor
+              ? or(
+                  lt(videos.updatedAt, cursor.updatedAt),
+                  and(
+                      eq(videos.updatedAt, cursor.updatedAt),
+                      lt(videos.id, cursor.id)
+                  )
+              )
+              : undefined,
+      )).orderBy(desc(videos.updatedAt), desc(videos.id))
+      .limit(limit + 1);
+
+      const hasMore = data.length > limit;
+      // Remove the last item if there is more data
+      const items = hasMore ? data.slice(0, -1) : data;
+      // Set the next cursor to the last item if there is more data
+      const lastItem = items[items.length -1];
+      const nextCursor = hasMore 
+      ? {
+          id: lastItem.id,
+          updatedAt: lastItem.updatedAt,
+      }
+      : null
+
+      return {
+          items,
+          nextCursor,
+      };
+  })
+  
 })
