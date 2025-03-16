@@ -10,6 +10,7 @@ import {
  } from "@mux/mux-node/resources/webhooks";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { UTApi } from "uploadthing/server";
 import { string } from "zod";
 
 const SIGNING_SECRET = process.env.MUX_WEBHOOK_SECRET!;
@@ -72,9 +73,33 @@ throw new Response("No signature found", { status: 401   });
                 return new Response("No playback ID found", { status: 400 });
             }
         
-            const thumbnailUrl = `https://image.mux.com./${playbackId}/thumbnail.jpg`;
-        const previewUrl = `https://image.mux.com./${playbackId}/anianimated.gif`;
-        const duration = data.duration? Math.round(data.duration*1000): 0;
+            const tempThumbnailUrl = `https://image.mux.com./${playbackId}/thumbnail.jpg`;
+        const tempPreviewUrl = `https://image.mux.com./${playbackId}/anianimated.gif`;
+
+const utapi = new UTApi();
+const [
+    uploadeThumbnail,
+    uploadedPreview,
+] = await utapi.uploadFilesFromUrl([
+    tempPreviewUrl,
+    tempThumbnailUrl,
+]);
+
+if(!uploadeThumbnail || !uploadedPreview){
+    return new Response("failed to upload thumbnail_url or preview_Url", {status: 500})
+}
+
+if (!uploadeThumbnail.data) {
+    return new Response("Failed to upload thumbnail", { status: 500 });
+}
+const { key: thumbnailKey, url: thumbnailUrl } = uploadeThumbnail.data;
+if (!uploadedPreview.data) {
+    return new Response("Failed to upload preview", { status: 500 });
+}
+const { key: previewKey, url: previewUrl } = uploadedPreview.data;
+
+
+ const duration = data.duration? Math.round(data.duration*1000): 0;
 
             await db 
             .update(videos)
@@ -83,6 +108,8 @@ throw new Response("No signature found", { status: 401   });
                 muxPlaybackId : playbackId,
                 muxStatus: data.status,
                 thumbnailUrl,
+                previewKey,
+                thumbnailKey,
                 previewUrl,
                 duration,
             })

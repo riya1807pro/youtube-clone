@@ -4,7 +4,7 @@ import { videoInsertSchema, videoUpdateSchema } from "@/db/schema"
 import { trpc } from "@/trpc/client"
 
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
-import { CopyCheckIcon, CopyIcon, Globe2Icon, LockIcon, MoreVerticalIcon, Trash2Icon, TrashIcon, Video } from "lucide-react"
+import { CopyCheckIcon, CopyIcon, Globe2Icon, ImagePlusIcon, LockIcon, MoreVerticalIcon, RotateCcwIcon, SparkleIcon, Trash2Icon, TrashIcon, Video } from "lucide-react"
 import { Suspense, useState } from "react"
 import { ErrorBoundary } from "react-error-boundary"
 import { Form, useForm } from "react-hook-form"
@@ -19,6 +19,10 @@ import { toast } from "sonner"
 import { VideoPlayer } from "@/modules/videos/ui/components/videoPlayer"
 import Link from "next/link"
 import { snakeCaseToTitle } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { THUMBNAIL_FALLBACK } from "@/modules/videos/constant"
+import { ThumbnailUploadModel } from "../components/thumbnail_Upload_model"
 
 interface FormSectionProps{
     videoId : string
@@ -40,6 +44,7 @@ export const FormSkeletonSection =()=>{
 const FormSectionSuspense =({
     videoId
 }:FormSectionProps)=>{
+    const [thumbnailOpenModel , setThumbnailOpenModel] =  useState(false)
     const router = useRouter();
     const utils = trpc.useUtils();
     const [videoData] = trpc.studio.getOne.useSuspenseQuery({
@@ -60,6 +65,17 @@ const FormSectionSuspense =({
         },
         onError:()=>{
             toast.error("sometung went wrong")
+        }
+    });
+
+    const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
+        onSuccess:()=>{
+           utils.studio.getMany.invalidate();
+           utils.studio.getOne.invalidate({id: videoId});
+           toast.success("Thumbnail restored")
+        },
+        onError:()=>{
+            toast.error("sometung went wrong in restoring thumbnail")
         }
     });
 
@@ -95,6 +111,12 @@ const FormSectionSuspense =({
     };
 
     return (
+        <>
+        <ThumbnailUploadModel
+        open={thumbnailOpenModel}
+        onOpenChange={setThumbnailOpenModel}
+        videoId={videoId}
+        />
        <Form {...form }>
         <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex items-center justify-between mb-6">
@@ -127,7 +149,7 @@ const FormSectionSuspense =({
                 control={form.control}
                 name="title"
                 render={({field})=>(
-
+                    
                     <FormItem>
                         <FormLabel>
 
@@ -167,7 +189,55 @@ Discription
                 )}
                 >
                 </FormField>
-                    {/* aadd thumbnail here  */}
+                  <FormField
+                  name="thumbnailUrl"
+                  control={form.control}
+                  render={()=>(
+                    <FormItem>
+                        <FormLabel>ThumbNailURL</FormLabel>
+                        <FormControl>
+                            <div className="p-0.5 border border-dashed border-neutral-400 relative 
+                            h-[84px] w-[153px] group">
+                                <Image
+                                src={video.thumbnailUrl ??THUMBNAIL_FALLBACK}
+                                alt="thumbnailUrl"
+                                className="object-cover"
+                                fill
+                                />
+                              <DropdownMenu >
+                                <DropdownMenuTrigger asChild>
+                                <Button
+                                type="button"
+                                size="icon"
+                                className="bg-black/50 hover:bg-black/50 abolute top-1 right-1 
+                                rounded-full opacity-100 md:opacity-0 group-hover: opacity-100
+                                duration-300 size-7"
+                                >
+                                    <MoreVerticalIcon className="text-white"/>
+                                </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={()=>setThumbnailOpenModel(true)}>
+                                        <ImagePlusIcon className="size-4 mr-1"/>
+                                        Change
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <SparkleIcon className="size-4 mr-1"/>
+                                        Ai-Generated
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={()=> restoreThumbnail.mutate({
+                                        id: videoId
+                                    })}>
+                                        <RotateCcwIcon className="size-4 mr-1"/>
+                                        Restore
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                        </FormControl>
+                    </FormItem>
+    )}
+                  />
                     <FormField
                 control={form.control}
                 name="categoryId"
@@ -299,5 +369,6 @@ Visibilty
         </div>
         </form>
        </Form>
+                        </>
     )
 }

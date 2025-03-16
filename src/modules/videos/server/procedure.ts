@@ -4,13 +4,84 @@ import { mux } from "@/lib/mux";
 import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
+import { UTApi } from "uploadthing/server";
 import { z } from "zod";
 
 export const VideoRouter = createTRPCRouter({
+  restoreThumbnail: ProtectedProcedure
+  .input(z.object({id: z.string().uuid()}))
+  .mutation(async ({ctx,input})=>{
+    const userId = ctx.userId?.toString();
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "User is not authenticated." });
+    }
+
+const [existingVideos] = await db
+.select()
+.from(videos)
+.where(and(
+  eq(videos.id,input.id),
+  eq(videos.userId, userId)
+)) ;
+
+if(!existingVideos){
+  throw new TRPCError({code: "NOT_FOUND"});
+}
+
+
+  if (existingVideos.thumbnailKey) {
+            const utapi = new UTApi(); 
+    await utapi.deleteFiles(existingVideos.thumbnailKey);
+    await db
+    .update(videos)
+    .set({
+      thumbnailKey: null, thumbnailUrl: null,
+    }) 
+    .where(and(
+      eq(videos.id , input.id),
+      eq(videos.userId, userId)
+    ))
+  }
+
+
+if(!existingVideos.muxPlaybackId){
+  throw new TRPCError({code : "BAD_REQUEST"})
+}
+
+const utapi = new UTApi();
+const tempThumbnailUrl = `https://image.mux.com./${existingVideos.muxPlaybackId}/thumbnail.jpg`;
+const uploadeThumbnail = await utapi.uploadFilesFromUrl(tempThumbnailUrl)
+
+if(!uploadeThumbnail){
+  throw new TRPCError({code: "INTERNAL_SERVER_ERROR"})
+}
+
+if (!uploadeThumbnail || !uploadeThumbnail.data || !uploadeThumbnail.data.key || !uploadeThumbnail.data.url) {
+  throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to upload thumbnail." });
+}
+const { key: thumbnailKey, url: thumbnailUrl } = uploadeThumbnail.data;
+
+const updatedVideos = await db
+.update(videos)
+.set({thumbnailUrl,thumbnailKey})
+.where(and(
+  eq(videos.id, input.id),
+  eq(videos.userId,userId)
+))
+.returning();
+return updatedVideos;
+
+  }),
   remove:ProtectedProcedure
   .input(z.object({id: z.string().uuid()}))
   .mutation(async ({ctx,input})=>{
-    const {id: userId} = ctx.userId;
+    const userId = ctx.userId?.toString();
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "User is not authenticated." });
+    }
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "User is not authenticated." });
+    }
 
     const [removedVideo] = await db
     .delete(videos)
@@ -83,10 +154,14 @@ export const VideoRouter = createTRPCRouter({
   }),
 
   update: ProtectedProcedure.input(videoUpdateSchema).mutation(async ({ ctx, input }) => {
-    const { id: userId } = ctx.userId;
+    const userId = ctx.userId?.toString();
 
     if (!input.id) {
       throw new TRPCError({ code: "BAD_REQUEST", message: "Video ID is required." });
+    }
+
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "User is not authenticated." });
     }
 
     const [updateVideo] = await db
