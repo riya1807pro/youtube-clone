@@ -11,17 +11,17 @@ interface CategorySectionProps {
 
 const CategorySection = ({ categoryId }: CategorySectionProps) => {
   return (
-    <Suspense fallback={<CategorySkeleton/>}>
+    <Suspense fallback={<CategorySkeleton />}>
       <ErrorBoundary fallback={<p>Error....</p>}>
         <CategorySectionSuspense categoryId={categoryId} />
       </ErrorBoundary>
     </Suspense>
   );
 };
- 
-const CategorySkeleton = ()=>{
- return <FilterCorousal isLoading data={[]}  onSelect={()=>{}} />
-}
+
+const CategorySkeleton = () => {
+  return <FilterCorousal isLoading data={[]} onSelect={() => {}} />;
+};
 
 const CategorySectionSuspense = ({ categoryId }: CategorySectionProps) => {
   const router = useRouter();
@@ -30,23 +30,21 @@ const CategorySectionSuspense = ({ categoryId }: CategorySectionProps) => {
     value: categories.id,
     label: categories.name,
   }));
-  console.log({ data });
-  const onSelect = (value:string|null) =>{
-    const url = new URL(window.location.href)
-    if(value){
-      url.searchParams.set("categoryId",value)
-    }else{
-      url.searchParams.delete("categoryId")
+  // console.log({ data });
+  const onSelect = (value: string | null) => {
+    const url = new URL(window.location.href);
+    if (value) {
+      url.searchParams.set("categoryId", value);
+    } else {
+      url.searchParams.delete("categoryId");
     }
 
-    router.push(url.toString())
-    
-  }
-
+    router.push(url.toString());
+  };
 
   return (
     <FilterCorousal
-onSelect={onSelect}
+      onSelect={onSelect}
       value={categoryId}
       data={data}
       isLoading={false}

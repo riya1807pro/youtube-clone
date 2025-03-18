@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Loader2Icon, PlusIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { trpc } from "@/trpc/client";
@@ -11,21 +11,21 @@ export const StudioUploadModel = () => {
   const router = useRouter();
   const utils = trpc.useUtils();
   const create = trpc.videos.create.useMutation({
-    onSuccess: ()=>{
-      toast.success("videp created!!!")
-      utils.studio.getMany.invalidate()
+    onSuccess: () => {
+      toast.success("videp created!!!");
+      utils.studio.getMany.invalidate();
     },
-    onError : (error)=>{
-      toast.error(error.message)
-    }
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
-  const onSuccess =()=>{
-    if(!create.data?.video.id) return;
+  const onSuccess = () => {
+    if (!create.data?.video.id) return;
 
     create.reset();
-    router.push(`/studio/videos/${create.data.video.id}`)
-  }
+    router.push(`/studio/videos/${create.data.video.id}`);
+  };
 
   const handleCreate = () => {
     // Ensure you are passing necessary data, like title
@@ -34,14 +34,32 @@ export const StudioUploadModel = () => {
 
   return (
     <>
-    <ResponsiveMode open={!!create.data} title="Upload Video" onOpenChange={()=>create.reset()}>
-{create.data?.video ? <StudioUploader endPoint={create.data.video.id} onSuccess={onSuccess}/>: <Loader2Icon/>}
-    </ResponsiveMode>
-    <Button variant="secondary" onClick={handleCreate} disabled={create.isPaused}>
-{      create.isPending? <Loader2Icon className="animate-spin"/>: 
-      <PlusIcon />}
-      Create
-    </Button>
-      </>
+      <ResponsiveMode
+        open={!!create.data}
+        title="Upload Video"
+        onOpenChange={() => create.reset()}
+      >
+        {create.data?.video ? (
+          <StudioUploader
+            endPoint={create.data.video.id}
+            onSuccess={onSuccess}
+          />
+        ) : (
+          <Loader2Icon />
+        )}
+      </ResponsiveMode>
+      <Button
+        variant="secondary"
+        onClick={handleCreate}
+        disabled={create.isPaused}
+      >
+        {create.isPending ? (
+          <Loader2Icon className="animate-spin" />
+        ) : (
+          <PlusIcon />
+        )}
+        Create
+      </Button>
+    </>
   );
 };

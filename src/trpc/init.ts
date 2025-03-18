@@ -1,10 +1,12 @@
 import { db } from "@/db";
+import superjson from "superjson";
 import { users } from "@/db/schema";
 import { ratelimit } from "@/lib/ratelimit";
 import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { cache } from "react";
+
 export const createTRPCContext = cache(async () => {
   const { userId } = await auth();
   return { clerkUserId: { userId } };
@@ -18,7 +20,7 @@ const t = initTRPC.context<Context>().create({
   /**
    * @see https://trpc.io/docs/server/data-transformers
    */
-  // transformer: superjson,
+  transformer: superjson,
 });
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
@@ -29,31 +31,34 @@ export const ProtectedProcedure = t.procedure.use(async function isAuthed(
   opts
 ) {
   const { ctx } = opts;
-  if (!ctx.clerkUserId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+  const { userId } = ctx.clerkUserId;
+
+  if (!userId) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "User is not authenticated",
+    });
   }
-  const userId = ctx.clerkUserId?.userId;
 
-  if (userId) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerk_Id, userId)) // Proceed only if userId is valid
-      .limit(1);
+  // Look up user in the database
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerk_Id, userId))
+    .limit(1);
 
-    // if (!user) {
-    //   throw new TRPCError({ code: "UNAUTHORIZED" });
-    // }
-    console.log("User ID is valid.", user);
+  console.log("Database query result:", user);
 
-    const { success } = await ratelimit.limit(userId);
+  if (!user) {
+    console.error("usernot found pleasecheckinit ");
+  }
 
-    if (!success) {
-      throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
-    }
-  } else {
-    // Handle case where userId is null or undefined
-    console.log("User ID is null or undefined.");
+  console.log("userId from context:", userId);
+
+  const { success } = await ratelimit.limit(userId);
+
+  if (!success) {
+    throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
   }
 
   return opts.next({

@@ -3,8 +3,7 @@ import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
-  CreateUpdateSchema
-} from "drizzle-zod"
+} from "drizzle-zod";
 
 import {
   integer,
@@ -30,9 +29,9 @@ export const users = pgTable(
   (t) => [uniqueIndex("clerk_id_idx").on(t.clerk_Id)]
 );
 
-export const usersRelation = relations(users, ({many})=>({
-  videos: many(videos)
-}))
+export const usersRelation = relations(users, ({ many }) => ({
+  videos: many(videos),
+}));
 
 export const categories = pgTable("cetegoires", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -42,17 +41,13 @@ export const categories = pgTable("cetegoires", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const categoryRelations  = relations(users, ({many})=>({
-  videos: many(videos)
-}))
+export const categoryRelations = relations(users, ({ many }) => ({
+  videos: many(videos),
+}));
 
-export const videoVisbility = pgEnum("video_Visbility",[
-  "private",
-  "public",
-])
+export const videoVisbility = pgEnum("video_Visbility", ["private", "public"]);
 
-
-export const videos = pgTable("videos",{
+export const videos = pgTable("videos", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   muxStatus: text("mux_status").notNull(),
@@ -62,33 +57,35 @@ export const videos = pgTable("videos",{
   muxTrackId: text("mux_track_id").notNull().unique(),
   muxTrackStatus: text("mux_track_status").notNull(),
   thumbnailUrl: text("thumbnail_url"),
-  thumbnailKey :  text("thumbnailKey"),
+  thumbnailKey: text("thumbnailKey"),
   previewUrl: text("preview_url"),
-  previewKey :  text("preview_key"),
+  previewKey: text("preview_key"),
   duration: integer("duration"),
   visibility: videoVisbility("visibility").default("private").notNull(),
- userId : uuid("user_id").references(()=>users.id,{
-  onDelete: "cascade",
- }).notNull(),
- categoryId : uuid("category").references(()=>categories.id,{
-  onDelete:"set null"
- }),
+  userId: uuid("user_id")
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  categoryId: uuid("category").references(() => categories.id, {
+    onDelete: "set null",
+  }),
   discription: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-})
+});
 
 export const videoInsertSchema = createInsertSchema(videos);
 export const videoUpdateSchema = createUpdateSchema(videos);
-export const videoSelectSchema = createSelectSchema(videos)
+export const videoSelectSchema = createSelectSchema(videos);
 
-export const videoRelatins = relations(videos, ({one})=>({
+export const videoRelatins = relations(videos, ({ one }) => ({
   user: one(users, {
     fields: [videos.userId],
-    references: [users.id]
+    references: [users.id],
   }),
   category: one(categories, {
     fields: [videos.categoryId],
-    references: [categories.id]
-  })
-}))
+    references: [categories.id],
+  }),
+}));

@@ -2,9 +2,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Link from "next/link";
 import { SearchInput } from "./searchInput";
-import { AuthButton } from "@/modules/auth/ui/components/auth-button";
-import { StudioSidebarHeader } from "../StudioSidebar/studo-header";
 import { StudioUploadModel } from "@/components/studio-upload-model";
+import { AuthButton } from "@/modules/auth/ui/components/auth-button";
 
 const StudioNavbar = () => {
   return (
