@@ -47,15 +47,15 @@ export const ProtectedProcedure = t.procedure.use(async function isAuthed(
     .where(eq(users.clerk_Id, userId))
     .limit(1);
 
-  console.log("Database query result:", user);
+  // console.log("Database query result:", user);
 
   if (!user) {
     console.error("usernot found pleasecheckinit ");
   }
 
-  console.log("userId from context:", userId);
+  // console.log("userId from context:", userId);
 
-  const { success } = await ratelimit.limit(userId);
+  const { success } = await ratelimit.limit(user.id);
 
   if (!success) {
     throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
@@ -64,7 +64,7 @@ export const ProtectedProcedure = t.procedure.use(async function isAuthed(
   return opts.next({
     ctx: {
       ...ctx,
-      userId,
+      user,
     },
   });
 });

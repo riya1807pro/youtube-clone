@@ -12,7 +12,7 @@ import { TRPCError } from "@trpc/server";
 export const studioRouter = createTRPCRouter({
   getOne: ProtectedProcedure.input(z.object({ id: z.string().uuid() })).query(
     async ({ ctx, input }) => {
-      const userId = ctx.userId;
+      const { id: userId } = ctx.user;
       const { id } = input;
 
       const [video] = await db
@@ -39,7 +39,7 @@ export const studioRouter = createTRPCRouter({
     })
   ).query(async ({ ctx, input }) => {
     const { cursor, limit } = input;
-    const userId = ctx.userId;
+    const userId = ctx.user.id;
 
     const data = await db
       .select()
