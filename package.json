@@ -5,7 +5,7 @@
   "scripts": {
     "dev:all": "concurrently \"bun run dev:webhook\" \"bun run dev\"",
     "dev": "next dev",
-    "dev:webhook": "ngrok http --url=roughly-suitable-ram.ngrok-free.app 3000",
+    "dev:webhook": "ngrok http --url=composed-jennet-complete.ngrok-free.app 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -61,6 +61,7 @@
     "cmdk": "^1.0.0",
     "concurrently": "9.1.2",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "0.39.0",
     "drizzle-zod": "0.7.0",
     "embla-carousel-react": "^8.5.2",

@@ -11,7 +11,7 @@ export const VideoRouter = createTRPCRouter({
   restoreThumbnail: ProtectedProcedure.input(
     z.object({ id: z.string().uuid() })
   ).mutation(async ({ ctx, input }) => {
-    const userId = ctx.userId?.toString();
+    const userId = ctx.user.id;
     if (!userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -75,7 +75,7 @@ export const VideoRouter = createTRPCRouter({
   remove: ProtectedProcedure.input(
     z.object({ id: z.string().uuid() })
   ).mutation(async ({ ctx, input }) => {
-    const userId = ctx.userId?.toString();
+    const userId = ctx.user.id;
     if (!userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -101,7 +101,7 @@ export const VideoRouter = createTRPCRouter({
   }),
 
   create: ProtectedProcedure.mutation(async ({ ctx }) => {
-    const userId = ctx.userId?.toString();
+    const userId = ctx.user.id;
 
     if (!userId) {
       console.error("No user found");
@@ -161,7 +161,7 @@ export const VideoRouter = createTRPCRouter({
 
   update: ProtectedProcedure.input(videoUpdateSchema).mutation(
     async ({ ctx, input }) => {
-      const userId = ctx.userId?.toString();
+      const userId = ctx.user.id;
 
       if (!input.id) {
         throw new TRPCError({
@@ -184,7 +184,7 @@ export const VideoRouter = createTRPCRouter({
           discription: input.discription, // fixed typo from 'discription' to 'description'
           categoryId: input.categoryId,
           visibility: input.visibility,
-        })
+        })  
         .where(and(eq(videos.id, input.id), eq(videos.userId, userId)))
         .returning();
 

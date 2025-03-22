@@ -85,7 +85,7 @@ export const FilterCorousal = ({
           {!isLoading &&
             data.map((item) => {
               // Log data for debugging
-              console.log(data);
+              // console.log(data);
 
               return (
                 <CarouselItem
