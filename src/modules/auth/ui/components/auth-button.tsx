@@ -12,12 +12,11 @@ export const AuthButton = () => {
       <SignedIn>
         <UserButton>
           <UserButton.MenuItems>
-            <UserButton.Link 
-            label="Studio"
-            href="/studio"
-            labelIcon={<ClapperboardIcon className="size-4"/>}
+            <UserButton.Link
+              label="Studio"
+              href="/studio"
+              labelIcon={<ClapperboardIcon className="size-4" />}
             />
-            <UserButton.Action onClick={() => console.log("Managing accounts")} labelIcon={<UserCircleIcon className="size-4" />} label="manage Accounts"/>
           </UserButton.MenuItems>
         </UserButton>
       </SignedIn>

@@ -10,7 +10,7 @@ export const SearchInput = () => {
         <input
           type="text"
           placeholder="search"
-          className="w-full pl-4 py-2 pr-12 rounded-2-full border focus-outline-none focus-border-blue-500"
+          className="w-full pl-4 py-2 pr-12 rounded-full border focus-outline-none focus-border-blue-500"
         />
         {/*add remove search button */}
       </div>

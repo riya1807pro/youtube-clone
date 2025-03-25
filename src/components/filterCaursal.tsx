@@ -95,7 +95,7 @@ export const FilterCorousal = ({
                 >
                   <Badge
                     // onClick={() => onSelect && onSelect(item.value)} // Call onSelect if provided
-                    variant={item.value === value ? "secondary" : "default"} // Handle individual item selection variant if needed
+                    variant={item.value === value ? "default" : "secondary"} // Handle individual item selection variant if needed
                     className="rounded-lg px-3 py-1 cursor-pointer whitespace-nowrap text-sm"
                   >
                     {item.label}
