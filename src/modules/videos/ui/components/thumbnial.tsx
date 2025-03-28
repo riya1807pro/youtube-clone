@@ -8,31 +8,37 @@ interface VideoThumbnailProps {
   title: string;
   duration: number;
 }
+
 export const VideoThumbnail = ({
   imageUrl,
   previewUrl,
   title,
   duration,
 }: VideoThumbnailProps) => {
+  console.log("imageUrl:", imageUrl);
+  console.log("previewUrl:", previewUrl);
+
   return (
     <div className="relative group">
-      {/*thumbnail wrapper  */}
+      {/* Thumbnail wrapper */}
       <div className="relative w-full overflow-hidden rounded-xl aspect-video">
         <Image
           src={imageUrl ?? THUMBNAIL_FALLBACK}
           alt={title}
           fill
-          className="h-full roup-hover: opacity-0 object-cover w-full"
+          className="h-full group-hover:opacity-0 object-cover w-full transition-opacity"
         />
-        <Image
-          unoptimized={!!previewUrl}
-          src={previewUrl ?? THUMBNAIL_FALLBACK}
-          alt={title}
-          fill
-          className="h-full group-hover: opacity-100 object-cover w-full"
-        />
+        {previewUrl && (
+          <Image
+            unoptimized
+            src={previewUrl}
+            alt={title}
+            fill
+            className="h-full group-hover:opacity-100 opacity-0 object-cover w-full transition-opacity"
+          />
+        )}
       </div>
-      {/* add video duration */}
+      {/* Video duration */}
       <div className="absolute bottom-2 right-2 px-1 py-0.5 rounded bg-black/80 text-xs text-white font-medium">
         {formatDuration(duration)}
       </div>

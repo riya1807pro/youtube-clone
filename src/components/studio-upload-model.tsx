@@ -21,10 +21,10 @@ export const StudioUploadModel = () => {
   });
 
   const onSuccess = () => {
-    if (!create.data?.video.id) return;
+    if (!create.data?.video.id) router.push("/");
 
     create.reset();
-    router.push(`/studio/videos/${create.data.video.id}`);
+    router.push(`/studio/videos/${create.data?.video.id}`);
   };
 
   const handleCreate = () => {
@@ -35,7 +35,7 @@ export const StudioUploadModel = () => {
   return (
     <>
       <ResponsiveMode
-        open={!!create.data}
+        open={!!create.data?.uploadUrl}
         title="Upload Video"
         onOpenChange={() => create.reset()}
       >

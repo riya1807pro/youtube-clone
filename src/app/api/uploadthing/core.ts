@@ -50,26 +50,26 @@ export const ourFileRouter = {
         eq(videos.userId, user.id)
       ))
 
-      if(!existingVideos){
-        throw new UploadThingError("Not found");
-      }
+      // if(!existingVideos){
+      //   throw new UploadThingError("Not found");
+      // }
 
-      if(existingVideos){
-        const utapi = new UTApi();
+      // if(existingVideos){
+      //   const utapi = new UTApi();
 
-        if (existingVideos.thumbnailKey) {
-          await utapi.deleteFiles(existingVideos.thumbnailKey);
-        }
-        await db
-        .update(videos)
-        .set({
-          thumbnailKey: null, thumbnailUrl: null,
-        }) 
-        .where(and(
-          eq(videos.id , input.videoId),
-          eq(videos.userId, user.id)
-        ))
-      }
+      //   if (existingVideos.thumbnailKey) {
+      //     await utapi.deleteFiles(existingVideos.thumbnailKey);
+      //   }
+      //   await db
+      //   .update(videos)
+      //    .set({
+      //     thumbnailKey: null, thumbnailUrl: null,
+      //    }) 
+      //   .where(and(
+      //     eq(videos.id , input.videoId),
+      //     eq(videos.userId, user.id)
+      //   ))
+      // }
 
       return { user , ...input};
     })
