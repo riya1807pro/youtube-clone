@@ -41,7 +41,7 @@ export const StudioUploadModel = () => {
       >
         {create.data?.video ? (
           <StudioUploader
-            endPoint={create.data.video.id}
+            endPoint={create.data.uploadUrl}
             onSuccess={onSuccess}
           />
         ) : (

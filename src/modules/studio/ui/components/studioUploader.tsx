@@ -16,6 +16,11 @@ export const StudioUploader = ({
   endPoint,
   onSuccess,
 }: StudioUploaderProps) => {
+  console.log("Uploader endpoint:", endPoint);
+  if (!endPoint) {
+    console.error("Upload endpoint is not provided!");
+    return null;
+  }
   return (
     <div>
       <MuxUploader

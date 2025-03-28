@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { videos, videoUpdateSchema } from "@/db/schema";
 import { mux } from "@/lib/mux";
 import { createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
+// import { Uploads } from "@mux/mux-node/resources/video/uploads.mjs";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
@@ -11,7 +12,7 @@ export const VideoRouter = createTRPCRouter({
   restoreThumbnail: ProtectedProcedure.input(
     z.object({ id: z.string().uuid() })
   ).mutation(async ({ ctx, input }) => {
-    const userId = ctx.user.id;
+    const { id: userId } = ctx.user;
     if (!userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -75,7 +76,7 @@ export const VideoRouter = createTRPCRouter({
   remove: ProtectedProcedure.input(
     z.object({ id: z.string().uuid() })
   ).mutation(async ({ ctx, input }) => {
-    const userId = ctx.user.id;
+    const { id: userId } = ctx.user;
     if (!userId) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -101,7 +102,7 @@ export const VideoRouter = createTRPCRouter({
   }),
 
   create: ProtectedProcedure.mutation(async ({ ctx }) => {
-    const userId = ctx.user.id;
+    const { id: userId } = ctx.user;
 
     if (!userId) {
       console.error("No user found");
@@ -149,7 +150,7 @@ export const VideoRouter = createTRPCRouter({
         })
         .returning();
 
-      return { video };
+      return { video, uploadUrl: upload.url };
     } catch (error) {
       console.error("Error creating video:", error);
       throw new TRPCError({
@@ -161,7 +162,7 @@ export const VideoRouter = createTRPCRouter({
 
   update: ProtectedProcedure.input(videoUpdateSchema).mutation(
     async ({ ctx, input }) => {
-      const userId = ctx.user.id;
+      const { id: userId } = ctx.user;
 
       if (!input.id) {
         throw new TRPCError({
@@ -184,7 +185,7 @@ export const VideoRouter = createTRPCRouter({
           discription: input.discription, // fixed typo from 'discription' to 'description'
           categoryId: input.categoryId,
           visibility: input.visibility,
-        })  
+        })
         .where(and(eq(videos.id, input.id), eq(videos.userId, userId)))
         .returning();
 
@@ -195,7 +196,7 @@ export const VideoRouter = createTRPCRouter({
         });
       }
 
-      return { video: updateVideo };
+      return { video: videos };
     }
   ),
 });
