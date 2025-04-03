@@ -34,7 +34,7 @@ export const POST = async (request: Request) => {
       return new Response("No signature found", { status: 401 });
     }
 
-    const payload: any = await request.json();
+    const payload = await request.json();
     const body = JSON.stringify(payload);
 
     mux.webhooks.verifySignature(

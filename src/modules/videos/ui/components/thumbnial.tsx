@@ -15,8 +15,8 @@ export const VideoThumbnail = ({
   title,
   duration,
 }: VideoThumbnailProps) => {
-  console.log("imageUrl:", imageUrl);
-  console.log("previewUrl:", previewUrl);
+  // console.log("imageUrl:", imageUrl);
+  // console.log("previewUrl:", previewUrl);
 
   return (
     <div className="relative group">
