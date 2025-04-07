@@ -9,6 +9,7 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -29,9 +30,10 @@ export const users = pgTable(
   (t) => [uniqueIndex("clerk_id_idx").on(t.clerk_Id)]
 );
 
-export const usersRelation = relations(users, ({ many }) => ({
-  videos: many(videos),
-}));
+// export const usersRelation = relations(users, ({ many }) => ({
+//   videos: many(videos),
+//   VideoViews: many(VideoViews)
+// }));
 
 export const categories = pgTable("cetegoires", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -41,9 +43,9 @@ export const categories = pgTable("cetegoires", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const categoryRelations = relations(users, ({ many }) => ({
-  videos: many(videos),
-}));
+// export const categoryRelations = relations(users, ({ many }) => ({
+//   videos: many(videos),
+// }));
 
 export const videoVisbility = pgEnum("video_Visbility", ["private", "public"]);
 
@@ -79,13 +81,42 @@ export const videoInsertSchema = createInsertSchema(videos);
 export const videoUpdateSchema = createUpdateSchema(videos);
 export const videoSelectSchema = createSelectSchema(videos);
 
-export const videoRelatins = relations(videos, ({ one }) => ({
-  user: one(users, {
-    fields: [videos.userId],
-    references: [users.id],
-  }),
-  category: one(categories, {
-    fields: [videos.categoryId],
-    references: [categories.id],
-  }),
-}));
+// export const videoRelatins = relations(videos, ({ one }) => ({
+//   user: one(users, {
+//     fields: [videos.userId],
+//     references: [users.id],
+//   }),
+//   category: one(categories, {
+//     fields: [videos.categoryId],
+//     references: [categories.id],
+//   }),
+// }));
+
+export const VideoViews = pgTable("videoViews",{
+  userId: uuid("user_id").references(() => users.id, {onDelete: "cascade"}).notNull(),
+  videoId: uuid("video_id").references(() => videos.id, {onDelete: "cascade"}).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+},(t)=>[
+  primaryKey({
+    name: "video_views_pk",
+    columns: [t.videoId, t.userId]
+  })
+])
+
+// export const VideoViewsRelation = relations(VideoViews,({one,many})=>({
+//   users:one(users,{
+//     fields:[VideoViews.userId],
+//     references: [users.id]
+//   }),
+//   videos:one(videos,{
+//     fields:[VideoViews.userId],
+//     references: [videos.id]
+//   }),
+//   views: many(VideoViews)
+// }))
+
+
+export const videoViewsInsertSchema = createInsertSchema(VideoViews);
+export const videoViewsUpdateSchema = createUpdateSchema(VideoViews);
+export const videoViewsSelectSchema = createSelectSchema(VideoViews);
