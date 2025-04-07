@@ -8,7 +8,7 @@ interface PageProps {
 const dynamic = "force-dynamic";
 
 const Page = async ({ params }: PageProps) => {
-    const { videoId } = params; // Extract videoId directly from params
+    const { videoId } = await params; // Extract videoId directly from params
     // Ensure videoId is available
     if (!videoId) {
       return <p>No video ID available</p>;

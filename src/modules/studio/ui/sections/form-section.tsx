@@ -207,9 +207,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     update.mutate(data);
   };
 
-  const fullUrl = `${
-    process.env.VERCAL_URL || "http://localhost:3000"
-  }/videos/${videoId}`;
+  const fullUrl = `${process.env.VERCAL_URL || "http://localhost:3000"}/videos/${videoId}`;
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopy = () => {
