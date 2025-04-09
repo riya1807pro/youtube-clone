@@ -1,4 +1,4 @@
-import { Many, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -33,10 +33,42 @@ export const users = pgTable(
 export const usersRelation = relations(users, ({ many }) => ({
   videos: many(videos),
   VideoViews: many(VideoViews),
-  VideoReaction: many(VideoReaction)
+  VideoReaction: many(VideoReaction),
+  subscriptions: many(subscriptions, {
+    relationName: "subscriptions_Viewer_Id_fkey", // No change in schema
+  }),
+  subscribers: many(subscriptions, {
+    relationName: "subscriptions_creator_Id_fkey", // No change in schema
+  }),
 }));
 
-export const categories = pgTable("cetegoires", {
+export const subscriptions = pgTable("subscriptions",{
+  viewerId:uuid("viewer_id").references(()=> users.id,{onDelete:"cascade"}).notNull(),
+  creatorId:uuid("creator_id").references(()=> users.id,{onDelete:"cascade"}).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+},(t)=>[
+  primaryKey({
+    name: "subscriptions_pk",
+    columns:[ t.viewerId, t.creatorId],
+  }),
+]);
+
+
+export const subscriptionsRelation = relations(subscriptions, ({ one }) => ({
+  viewer: one(users, {
+    fields: [subscriptions.viewerId],
+    references: [users.id],
+    relationName: "subscriptions_Viewer_Id_fkey", // No change in schema
+  }),
+  creator: one(users, {
+    fields: [subscriptions.creatorId],
+    references: [users.id],
+    relationName: "subscriptions_creator_Id_fkey", // No change in schema
+  }),
+}));
+
+export const categories = pgTable("categories", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   discription: text("description"),

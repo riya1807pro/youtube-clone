@@ -2,3 +2,7 @@ $ curl -X POST http://localhost:3000/api/videos/workflows/title
 curl: (7) Failed to connect to localhost port 3000: Connection refused     -during ai background job of upstash workflows
 
 also workflows is not working................maybe beause of the above
+
+group by in video procedure 
+
+subscriptions and other name in schema
