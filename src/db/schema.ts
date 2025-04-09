@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { Many, relations } from "drizzle-orm";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -30,10 +30,11 @@ export const users = pgTable(
   (t) => [uniqueIndex("clerk_id_idx").on(t.clerk_Id)]
 );
 
-// export const usersRelation = relations(users, ({ many }) => ({
-//   videos: many(videos),
-//   VideoViews: many(VideoViews)
-// }));
+export const usersRelation = relations(users, ({ many }) => ({
+  videos: many(videos),
+  VideoViews: many(VideoViews),
+  VideoReaction: many(VideoReaction)
+}));
 
 export const categories = pgTable("cetegoires", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -43,9 +44,9 @@ export const categories = pgTable("cetegoires", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// export const categoryRelations = relations(users, ({ many }) => ({
-//   videos: many(videos),
-// }));
+export const categoryRelations = relations(users, ({ many }) => ({
+  videos: many(videos),
+}));
 
 export const videoVisbility = pgEnum("video_Visbility", ["private", "public"]);
 
@@ -81,16 +82,18 @@ export const videoInsertSchema = createInsertSchema(videos);
 export const videoUpdateSchema = createUpdateSchema(videos);
 export const videoSelectSchema = createSelectSchema(videos);
 
-// export const videoRelatins = relations(videos, ({ one }) => ({
-//   user: one(users, {
-//     fields: [videos.userId],
-//     references: [users.id],
-//   }),
-//   category: one(categories, {
-//     fields: [videos.categoryId],
-//     references: [categories.id],
-//   }),
-// }));
+export const videoRelations = relations(videos, ({ one ,many}) => ({
+  user: one(users, {
+    fields: [videos.userId],
+    references: [users.id],
+  }),
+  category: one(categories, {
+    fields: [videos.categoryId],
+    references: [categories.id],
+  }),
+  views: many(VideoViews),
+  reaction : many(VideoReaction)
+}));
 
 export const VideoViews = pgTable("videoViews",{
   userId: uuid("user_id").references(() => users.id, {onDelete: "cascade"}).notNull(),
@@ -104,19 +107,52 @@ export const VideoViews = pgTable("videoViews",{
   })
 ])
 
-// export const VideoViewsRelation = relations(VideoViews,({one,many})=>({
-//   users:one(users,{
-//     fields:[VideoViews.userId],
-//     references: [users.id]
-//   }),
-//   videos:one(videos,{
-//     fields:[VideoViews.userId],
-//     references: [videos.id]
-//   }),
-//   views: many(VideoViews)
-// }))
+export const VideoViewsRelation = relations(VideoViews,({one,many})=>({
+  users:one(users,{
+    fields:[VideoViews.userId],
+    references: [users.id]
+  }),
+  videos:one(videos,{
+    fields:[VideoViews.userId],
+    references: [videos.id]
+  }),
+  views: many(VideoViews)
+}))
 
 
 export const videoViewsInsertSchema = createInsertSchema(VideoViews);
 export const videoViewsUpdateSchema = createUpdateSchema(VideoViews);
 export const videoViewsSelectSchema = createSelectSchema(VideoViews);
+
+export const reactionType = pgEnum("reaction_type", ["like","dislike"])
+
+
+export const VideoReaction = pgTable("video_reaction",{
+  userId: uuid("user_id").references(() => users.id, {onDelete: "cascade"}).notNull(),
+  videoId: uuid("video_id").references(() => videos.id, {onDelete: "cascade"}).notNull(),
+  type:reactionType("type").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+},(t)=>[
+  primaryKey({
+    name: "video_reactions_pk",
+    columns: [t.videoId, t.userId]
+  })
+])
+
+export const VideoReactionRelation = relations(VideoReaction,({one,many})=>({
+  users:one(users,{
+    fields:[VideoReaction.userId],
+    references: [users.id]
+  }),
+  videos:one(videos,{
+    fields:[VideoReaction.userId],
+    references: [videos.id]
+  }),
+  views: many(VideoViews)
+}))
+
+
+export const videoReactionInsertSchema = createInsertSchema(VideoReaction);
+export const videoReactionUpdateSchema = createUpdateSchema(VideoReaction);
+export const videoReactionSelectSchema = createSelectSchema(VideoReaction);

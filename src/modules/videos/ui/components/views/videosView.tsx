@@ -23,4 +23,4 @@ const VideoView = ({videoId}: videoViewProps)=>{
         </div>
     )
 }
-export default VideoViewu
+export default VideoView
