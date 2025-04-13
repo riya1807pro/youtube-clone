@@ -32,7 +32,7 @@ export const VideoOwner = ({user,videoId}:VideoOwnerProps)=>{
             </div>
         </div>
         </Link>
-        {clerkUserId === user.clerk_Id} ? (
+        {(clerkUserId === user.clerk_Id) ? (
             <Button variant="secondary" className="rounded-full " asChild> 
                 <Link href={`/studio/videos/${videoId}`}>
                 Edit video
@@ -45,7 +45,7 @@ export const VideoOwner = ({user,videoId}:VideoOwnerProps)=>{
             isSubscribed={user.viewerSubscribed}
             className="flex-none"
             />
-        )
+        )}
         </div>
     )
 }

@@ -57,10 +57,13 @@ export const CommentForm = ({
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("Form values:", values);
     create.mutate({
       videoId: values.videoId,
-      Value: values.values, // map 'values' → 'Value'
+      values: values.values, // ✅ match with new form field
+      parentId: values.parentId,
     });
+    
   };
 
   const handleCancel = ()=>{

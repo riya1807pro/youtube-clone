@@ -32,32 +32,34 @@ export const commentsRouter = createTRPCRouter({
     .input(z.object({
         parentId: z.string().uuid().nullish(),
         videoId: z.string().uuid(),
-        Value: z.string(),
-
-    }))
-    .mutation(async ({ctx,input})=>{
-        const {parentId, videoId,Value} = input;
-        const {id: userId} = ctx.user;
-
-        const [existingComments] = await db
-          .select()
-          .from(comments)
-          .where(inArray(comments.id, parentId? [String(parentId)]: []))
-
-          if (!existingComments && parentId) {
+        values: z.string(), // ✅ lowercase and plural to match DB
+      }))
+    .mutation(async ({ctx, input}) => {
+        const { parentId, videoId, values } = input;
+        const { id: userId } = ctx.user;
+    
+        // validate parent comment if any
+        if (parentId) {
+          const [existingComment] = await db
+            .select()
+            .from(comments)
+            .where(eq(comments.id, parentId));
+    
+          if (!existingComment) {
             throw new TRPCError({ code: "NOT_FOUND" });
           }
-
-          if(existingComments.parentId && parentId){
-            throw new TRPCError({ code: "BAD_REQUEST"})
+    
+          if (existingComment.parentId) {
+            throw new TRPCError({ code: "BAD_REQUEST" }); // Reply to reply not allowed
           }
-        
-        const [createdComments] = await db
-        .insert(comments)
-        .values({userId, videoId,parentId, values: Value})
-        .returning();
-
-        return createdComments;
+        }
+    
+        const [createdComment] = await db
+          .insert(comments)
+          .values({ userId, videoId, parentId, values }) // ✅ match key
+          .returning();
+    
+        return createdComment;
     }),
     getMany: baseProcedure
     .input(
@@ -127,13 +129,13 @@ export const commentsRouter = createTRPCRouter({
             likeCount : db.$count(CommentReaction,
                 and(
                     eq(CommentReaction.type , "like"),
-                    eq(CommentReaction.commentId, comments)
+                    eq(CommentReaction.commentId, comments.id)
                 )
             ),
             dislikeCount : db.$count(CommentReaction,
                 and(
                     eq(CommentReaction.type , "dislike"),
-                    eq(CommentReaction.commentId, comments)
+                    eq(CommentReaction.commentId, comments.id)
                 )
             ),
         })
@@ -174,7 +176,7 @@ export const commentsRouter = createTRPCRouter({
     
 
         return {
-            totalCount: totalData[0].count,
+            totalCount: totalData[0]?.count ?? 0,
             items,
             nextCursor
         };
