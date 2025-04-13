@@ -97,7 +97,7 @@ export const VideoRouter = createTRPCRouter({
       const {id: userId} = ctx.user
       
      const {workflowRunId} = await workflow.trigger({
-      url: `${process.env.UPSTASH_WORKFLOW_URL!}/api/viddeos/workflows/discription`,
+      url: `${process.env.UPSTASH_WORKFLOW_URL!}/api/viddeos/workflows/description`,
       body:{userId, videoId: input.id}
      })
      return workflowRunId;
@@ -297,7 +297,7 @@ export const VideoRouter = createTRPCRouter({
         .update(videos)
         .set({
           title: input.title,
-          discription: input.discription, // fixed typo from 'discription' to 'description'
+          description: input.description, // fixed typo from 'description' to 'description'
           categoryId: input.categoryId,
           visibility: input.visibility,
         })

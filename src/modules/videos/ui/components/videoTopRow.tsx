@@ -71,7 +71,7 @@ const VideoTopRow = ({video}: VideoTopRow) =>{
             expendedViews={expendedViews}
             compactDate={compactDate}
             expendedDate={expendedDate}
-            description={video.discription}
+            description={video.description}
 
             />
         </div>

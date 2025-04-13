@@ -79,7 +79,7 @@ export const ThumbnailGenerateModel= ({
                         className="resize-none"
                         cols={30}
                         rows={5}
-                        placeholder="A Discription of wanted thumbnail: "
+                        placeholder="A description of wanted thumbnail: "
                         />
                     </FormControl>
                     <FormMessage/>

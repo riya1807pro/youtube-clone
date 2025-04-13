@@ -9,13 +9,13 @@ interface InputType {
   videoId:string,
 }
 
-const Description_SYSTEM_PROMPT = `Your task is to generate an SEO-focused discription for a YouTube video based on its transcript. Please follow these guidelines:
+const Description_SYSTEM_PROMPT = `Your task is to generate an SEO-focused description for a YouTube video based on its transcript. Please follow these guidelines:
 - Be concise but descriptive, using relevant keywords to improve discoverability.
 - Highlight the most compelling or unique aspect of the video content.
 - Avoid jargon or overly complex language unless it directly supports searchability.
 - Use action-oriented phrasing or clear value propositions where applicable.
-- Ensure the discription is 3–8 words long and no more than 100 characters.
-- ONLY return the discription as plain text. Do not add quotes or any additional formatting.`;
+- Ensure the description is 3–8 words long and no more than 100 characters.
+- ONLY return the description as plain text. Do not add quotes or any additional formatting.`;
 
 
 export const { POST } = serve(
@@ -52,7 +52,7 @@ export const { POST } = serve(
     })
 
     const {body}= await context.api.openai.call(
-      "generate-discription",
+      "generate-description",
       {
         token: process.env.OPENAI_API_KEY!,
         operation: "chat.completions.create",
@@ -72,9 +72,9 @@ export const { POST } = serve(
       }
     );
     
-    const discription  =  body.choices[0]?.message.content;
+    const description  =  body.choices[0]?.message.content;
 
-    if(!discription){
+    if(!description){
       throw new Error('Bad Request');
     }
 
@@ -82,7 +82,7 @@ export const { POST } = serve(
     await db
        .update(videos)
        .set({
-        discription:  discription || video.discription
+        description:  description || video.description
        })
          .where(and(
         eq(videos.id,  video.id),

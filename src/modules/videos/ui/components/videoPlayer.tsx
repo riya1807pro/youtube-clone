@@ -8,8 +8,8 @@ interface VideoPlayerProps {
 }
 
 export const VideoPlayerSkeleton = () => {
-  return <div className="aspect-video bg-black rounded-xl"/>
-}
+  return <div className="aspect-video bg-black rounded-xl" />;
+};
 
 export const VideoPlayer = ({
   playbackId,
@@ -20,13 +20,14 @@ export const VideoPlayer = ({
   if (!playbackId) return null;
 
   return (
-    <MuxPlayer
-      playback-id={playbackId} // Corrected prop name
-      poster={thumbnailUrl || undefined} // Using "poster" instead of "thumbnailUrl"
-      autoPlay={autoPlay}
-      className="w-full h-full object-content"
-      accentColor="#FF2056"
-      onPlay={onPlay}
-    />
+<MuxPlayer
+  playbackId={playbackId}
+  poster={thumbnailUrl || undefined}
+  autoPlay={autoPlay}
+  muted
+  className="w-full h-full object-content"
+  accentColor="#FF2056"
+  onPlay={onPlay}
+/>
   );
 };
