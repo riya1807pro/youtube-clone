@@ -14,7 +14,7 @@ import { UserAvatar } from "@/components/user-Avatar";
 import { UserInfo } from "@/modules/user/ui/component/user-info";
 
 import { VideoMenu } from "./vide-menu";
-import { VideoThumbnail } from "./thumbnial";
+import { VideoThumbnail, VideoThumbnailSkeleton } from "./thumbnial";
 import { VideoGetManyOutput } from "../../types";
 
 
@@ -47,17 +47,40 @@ interface VideoRowCardProps  extends VariantProps<typeof VideoRowCardVariants> {
     onRemove?: ()=> void;
 }
 
-export const VideoRowCardSkeleton = () => {
+export const VideoRowCardSkeleton = ({size="default"}:  VariantProps<typeof VideoRowCardVariants>) => {
     return (
-        <div>
-           <Skeleton/>
+        <div className={VideoRowCardVariants({size})}>
+            {/* thumbnail skeleton */}
+          <div className={thumbnailVariant({size})}>
+            <VideoThumbnailSkeleton/>
+          </div>
+          {/* info skeleton */}
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between gap-x-2">
+                <Skeleton className={cn("h-5 w-[40%] " , size === "compact" && "h-4 w0[40%]")}  />
+                {size === "default" && (
+                    <>
+                        <Skeleton className="h-4 w-[20%] mt-1"/>
+                        <div className="flex items-center gap-2 my-3">
+                            <Skeleton className="size-8 rounded-full"/>
+                            <Skeleton className="h-4 w-24"/>
+                        </div>
+                    </>
+                )}
+                {size === "compact" && (
+                    <>
+                       <Skeleton className="h-4 w-[50%] mt-1"/>
+                    </>
+                )}
+          </div>
+        </div>
         </div>
     )
 }
 
 export const VideoRowCard = ({
     data,
-    size,
+    size="default",
     onRemove
 }:VideoRowCardProps) =>{
 

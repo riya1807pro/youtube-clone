@@ -155,6 +155,17 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
   
+  const revalidate = trpc.videos.revalidate.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({id: videoId});
+      toast.success("Video revalidated successfully!!");
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
+  
   
   const generateDescription = trpc.videos.generateDescription.useMutation({
     onSuccess: () => {
@@ -205,6 +216,8 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   });
 
   const onSubmit = async (data: z.infer<typeof videoUpdateSchema>) => {
+    console.log(data);
+    console.log("thumbnail url : ",data.thumbnailUrl);
     update.mutate(data);
   };
 
@@ -541,6 +554,12 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                  </Button>
                </DropdownMenuTrigger>
                <DropdownMenuContent align="end">
+                 <DropdownMenuItem
+                   onClick={() => revalidate.mutate({ id: videoId })}
+                 >
+                   <RotateCcwIcon className="size-4 mr-2" />
+                      Revalidate
+                 </DropdownMenuItem>
                  <DropdownMenuItem
                    onClick={() => remove.mutate({ id: videoId })}
                  >

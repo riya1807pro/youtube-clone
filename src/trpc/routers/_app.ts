@@ -8,6 +8,7 @@ import { SubscriptionRouter } from "@/modules/subscription/server/procedure";
 import { commentsRouter } from "@/modules/commnets/server/procedure";
 import { CommentReactionsRouter } from "@/modules/commentReaction/server/procedure";
 import { SuggestionRouter } from "@/modules/suggestion/server/procedure";
+import { SearchRouter } from "@/modules/search/server/procedure";
 export const appRouter = createTRPCRouter({
   studio: studioRouter,
   categories: categoryRouter,
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   VideoReaction : VideoReactionsRouter,
   subscriptions: SubscriptionRouter,
   comments: commentsRouter,
+  search: SearchRouter,
   CommentReaction : CommentReactionsRouter,
   Suggestion: SuggestionRouter,
 });

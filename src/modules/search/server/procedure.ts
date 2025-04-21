@@ -2,17 +2,14 @@ import { db } from "@/db";
 import { z } from "zod";
 import { users, VideoReaction, videos, VideoViews } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, ProtectedProcedure } from "@/trpc/init";
-import { eq, or, and, lt, desc, getTableColumns, not } from "drizzle-orm";
+import { eq, or, and, lt, desc, ilike, getTableColumns } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
-// type id= {
-//     id : string| null
-// }
-
-export const SuggestionRouter = createTRPCRouter({
+export const SearchRouter = createTRPCRouter({
   getMany: baseProcedure.input(
     z.object({
-      videoId: z.string().uuid(),
+      query: z.string().nullish(),
+      categoryId: z.string().uuid().nullish(),
       cursor: z
         .object({
           id: z.string().uuid(),
@@ -22,42 +19,28 @@ export const SuggestionRouter = createTRPCRouter({
       limit: z.number().min(1).max(100),
     })
   ).query(async ({ input }) => {
-    const {videoId,  cursor, limit } = input;
-
-    const [existingVideos] = await db
-    .select()
-    .from(videos)
-    .where(eq(videos.id, videoId))
-
-    if(!existingVideos){
-      throw new TRPCError({code: "NOT_FOUND"})
-    }
+    const { cursor, limit, query, categoryId } = input;
 
     const data = await db
       .select({
         ...getTableColumns(videos),
-        user :  users,
-        viewCount : db.$count(VideoViews, eq(VideoViews.videoId, videos.id)),
-        likeCount : db.$count(VideoReaction, and(
-          eq(VideoReaction.videoId, videos.id),
-          eq(VideoReaction.type, "like"),
-        )),
-        disLikeCount : db.$count(VideoReaction, and(
-          eq(VideoReaction.videoId, videos.id),
-          eq(VideoReaction.type, "dislike"),
-        )),
+        user: users,
+         viewCount : db.$count(VideoViews, eq(VideoViews.videoId, videos.id)),
+         likeCount : db.$count(VideoReaction, and(
+           eq(VideoReaction.videoId, videos.id),
+           eq(VideoReaction.type, "like"),
+         )),
+         disLikeCount : db.$count(VideoReaction, and(
+           eq(VideoReaction.videoId, videos.id),
+           eq(VideoReaction.type, "dislike"),
+         )),
       })
       .from(videos)
-      .innerJoin(users, eq(videos.userId,  users.id))
+      .innerJoin(users, eq(videos.userId, users.id))
       .where(
         and(
-          not(eq(videos.id, existingVideos.id)),
-          eq(videos.visibility, "public"),
-          existingVideos.categoryId
-          ?(   
-            eq(videos.categoryId, existingVideos.categoryId)
-          )
-          : undefined  ,
+          ilike(videos.title, `%${query}%`), // Fix: used query inside template string
+          categoryId ? eq(videos.categoryId, categoryId) : undefined,
           cursor
             ? or(
                 lt(videos.updatedAt, cursor.updatedAt),

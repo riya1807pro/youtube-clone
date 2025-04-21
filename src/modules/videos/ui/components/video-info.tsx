@@ -3,13 +3,25 @@ import { VideoGetManyOutput } from "../../types"
 import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 import { UserAvatar } from "@/components/user-Avatar"
-import { UserIcon } from "lucide-react"
 import { UserInfo } from "@/modules/user/ui/component/user-info"
 import { VideoMenu } from "./vide-menu"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface VideoInfoProps {
     data: VideoGetManyOutput["items"][number]
     onRemove?: () => void
+}
+
+export const VideoInfoSkeleton = () => {
+    return(
+        <div className="flex gap-3">
+            <Skeleton className="size-10 flex-shrink-0 rounded-full"/>
+            <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-5 w-[90%]"/>
+                <Skeleton className="h-5 w-[70%]"/>
+            </div>
+        </div>
+    )
 }
 
 export const VideoInfo = ({

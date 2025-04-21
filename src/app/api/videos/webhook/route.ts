@@ -85,7 +85,7 @@ export const POST = async (request: Request) => {
           .set({
             muxAssetId: data.id,
             muxPlaybackId: playbackId,
-            muxStatus: data.status,
+            muxStatus: data.status, 
             thumbnailUrl,
             previewKey,
             thumbnailKey,

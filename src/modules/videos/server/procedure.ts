@@ -124,6 +124,59 @@ export const VideoRouter = createTRPCRouter({
      })
      return workflowRunId;
   }),
+  revalidate: ProtectedProcedure
+  .input(z.object({id: z.string().uuid()}))
+  .mutation(async({ctx, input})=> {
+    const { id: userId } = ctx.user;
+    const [existingVideos] = await db
+    .select()
+    .from(videos)
+    .where(and(eq(videos.id, input.id), eq(videos.userId, userId)));
+
+  if (!existingVideos) {
+    throw new TRPCError({ code: "NOT_FOUND" });
+  }
+if(!existingVideos.muxUploaderId){
+  throw new TRPCError({code: "BAD_REQUEST" })
+}
+
+const uploads = await mux.video.uploads.retrieve(
+  existingVideos.muxUploaderId
+)
+
+if(!uploads || !uploads.asset_id){
+  throw new TRPCError({code: "BAD_REQUEST"})
+}
+
+const assets  = await mux.video.assets.retrieve(
+  uploads.asset_id
+)
+
+if(!assets){
+  throw new TRPCError({code :"BAD_REQUEST"})
+}
+const playbackId = assets.playback_ids?.[0].id;
+const duration = assets.duration? Math.round(assets.duration * 1000) : 0;
+
+// todo : find a way too revalidate track status as well
+
+const [updatedVideos] =  await db 
+.update(videos)
+.set({
+  muxStatus: assets.status,
+  muxPlaybackId: playbackId,
+  muxAssetId: assets.id,
+  duration: duration,
+})
+.where(and(
+  eq(videos.id, input.id),
+  eq(videos.userId,userId)
+))
+.returning()
+
+return updatedVideos; 
+})
+  ,
   restoreThumbnail: ProtectedProcedure.input(
     z.object({ id: z.string().uuid() })
   ).mutation(async ({ ctx, input }) => {
