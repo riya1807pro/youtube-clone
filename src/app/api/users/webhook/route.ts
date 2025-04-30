@@ -6,6 +6,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {
+<<<<<<< HEAD
   // const SIGNING_SECRET = process.env.CLERK_SIGNING_SECRET;
   // console.log(
   //   "-------------------------------------------------------------------"
@@ -58,11 +59,17 @@ export async function POST(req: Request) {
   //   });
   // }
 
+=======
+>>>>>>> 9f21a4b (internal structure improvements)
   const SIGNING_SECRET = process.env.CLERK_SIGNING_SECRET;
 
   if (!SIGNING_SECRET) {
     throw new Error(
+<<<<<<< HEAD
       "Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env"
+=======
+      "Error: Please add SIGNING_SECRET from Clerk Dashboard to .env or .env.local",
+>>>>>>> 9f21a4b (internal structure improvements)
     );
   }
 
@@ -104,12 +111,20 @@ export async function POST(req: Request) {
 
   // Do something with payload
   // For this guide, log payload to console
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9f21a4b (internal structure improvements)
   const eventType = evt.type;
 
   if (eventType === "user.created") {
     const { data } = evt;
     await db.insert(users).values({
+<<<<<<< HEAD
       clerk_Id: data.id,
+=======
+      clerkId: data.id,
+>>>>>>> 9f21a4b (internal structure improvements)
       name: `${data.first_name} ${data.last_name}`,
       imageUrl: data.image_url,
     });
@@ -117,6 +132,7 @@ export async function POST(req: Request) {
 
   if (eventType === "user.deleted") {
     const { data } = evt;
+<<<<<<< HEAD
     if (!data.id) {
       return new Response("Error: Missing user ID", {
         status: 400,
@@ -124,6 +140,15 @@ export async function POST(req: Request) {
     }
     await db.delete(users).where(eq(users.clerk_Id, data.id));
   }
+=======
+
+    if (!data.id) {
+      return new Response("Missing user id", { status: 400 });
+    }
+    await db.delete(users).where(eq(users.clerkId, data.id));
+  }
+
+>>>>>>> 9f21a4b (internal structure improvements)
   if (eventType === "user.updated") {
     const { data } = evt;
 
@@ -133,8 +158,14 @@ export async function POST(req: Request) {
         name: `${data.first_name} ${data.last_name}`,
         imageUrl: data.image_url,
       })
+<<<<<<< HEAD
       .where(eq(users.clerk_Id, data.id));
     // }
   }
+=======
+      .where(eq(users.clerkId, data.id));
+  }
+
+>>>>>>> 9f21a4b (internal structure improvements)
   return new Response("Webhook received", { status: 200 });
 }

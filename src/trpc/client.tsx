@@ -8,9 +8,16 @@ import { useState } from "react";
 import { makeQueryClient } from "./query-client";
 import type { AppRouter } from "./routers/_app";
 import superjson from "superjson";
+<<<<<<< HEAD
 import { APP_URL } from "@/modules/videos/constant";
 
 export const trpc = createTRPCReact<AppRouter>();
+=======
+import { APP_URL } from "@/constants";
+
+export const trpc = createTRPCReact<AppRouter>();
+
+>>>>>>> 9f21a4b (internal structure improvements)
 let clientQueryClientSingleton: QueryClient;
 function getQueryClient() {
   if (typeof window === "undefined") {
@@ -23,7 +30,11 @@ function getQueryClient() {
 function getUrl() {
   const base = (() => {
     if (typeof window !== "undefined") return "";
+<<<<<<< HEAD
     // CRUCIAL TO MODIFY IN .ENV TO PRODUCTION DOMAN {INCLUDING PRPTPCOL}
+=======
+
+>>>>>>> 9f21a4b (internal structure improvements)
     return APP_URL;
   })();
   return `${base}/api/trpc`;
@@ -31,7 +42,11 @@ function getUrl() {
 export function TRPCProvider(
   props: Readonly<{
     children: React.ReactNode;
+<<<<<<< HEAD
   }>
+=======
+  }>,
+>>>>>>> 9f21a4b (internal structure improvements)
 ) {
   // NOTE: Avoid useState when initializing the query client if you don't
   //       have a suspense boundary between this and the code that may
@@ -42,7 +57,11 @@ export function TRPCProvider(
     trpc.createClient({
       links: [
         httpBatchLink({
+<<<<<<< HEAD
           transformer: superjson, //*<-- if you use a data transformer
+=======
+          transformer: superjson,
+>>>>>>> 9f21a4b (internal structure improvements)
           url: getUrl(),
           async headers() {
             const headers = new Headers();
@@ -51,7 +70,11 @@ export function TRPCProvider(
           },
         }),
       ],
+<<<<<<< HEAD
     })
+=======
+    }),
+>>>>>>> 9f21a4b (internal structure improvements)
   );
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>

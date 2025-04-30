@@ -1,0 +1,30 @@
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=---key--here
+CLERK_SECRET_KEY=---secret-key-here
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+DATABASE_URL=-----neon-pg-url
+CLERK_SIGNING_SECRET
+
+
+UPSTASH_REDIS_REST_URL=-------redis-secret-url
+UPSTASH_REDIS_REST_TOKEN=---token-secret
+
+MUX_ACCESS_TOKEN =MUX---access-token
+MUX_SECRET_KEY = secret-key
+MUX_WEBHOOK_SECRET =webhook-secret 
+
+
+UPLOADTHING_TOKEN=---------------------------------------add-here
+
+QSTASH_TOKEN=----------------add-here
+UPSTASH_WORKFLOW_URL=https://foal-top-generally.ngrok-free.app
+
+
+QSTASH_CURRENT_SIGNING_KEY=----------------add-here
+QSTASH_NEXT_SIGNING_KEY=----------------add-here
+
+OPEN_API_KEY=---------ADD-HERE-----
+
+DEEPSEEK_API_KEY=----------------add-here

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { VideoViews } from "@/modules/studio/ui/views/video-views";
 import { HydrateClient, trpc } from "@/trpc/server";
 
@@ -20,6 +21,27 @@ const Page = async ({ params }: PageProps) => {
             <VideoViews videoId={videoId} />
         </HydrateClient>
     );
+=======
+import { VideoView } from "@/modules/studio/ui/views/video-view";
+import { HydrateClient, trpc } from "@/trpc/server";
+
+export const dynamic = "force-dynamic";
+
+interface PageProps {
+  params: Promise<{ videoId: string }>;
+}
+
+const Page = async ({ params }: PageProps) => {
+  const { videoId } = await params;
+
+  void trpc.studio.getOne.prefetch({ id: videoId });
+  void trpc.categories.getMany.prefetch();
+  return (
+    <HydrateClient>
+      <VideoView videoId={videoId} />
+    </HydrateClient>
+  );
+>>>>>>> 9f21a4b (internal structure improvements)
 };
 
 export default Page;

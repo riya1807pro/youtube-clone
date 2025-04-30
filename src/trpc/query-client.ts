@@ -3,6 +3,10 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import superjson from "superjson";
+<<<<<<< HEAD
+=======
+//import superjson from "superjson";
+>>>>>>> 9f21a4b (internal structure improvements)
 export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
