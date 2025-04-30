@@ -158,7 +158,8 @@ if(!assets){
 const playbackId = assets.playback_ids?.[0].id;
 const duration = assets.duration? Math.round(assets.duration * 1000) : 0;
 
-// todo : find a way too revalidate track status as well
+// todo : find a way too revalidate track status as well\
+
 
 const [updatedVideos] =  await db 
 .update(videos)

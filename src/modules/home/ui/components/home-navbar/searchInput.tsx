@@ -4,33 +4,43 @@ import { Button } from "@/components/ui/button";
 import { APP_URL} from "@/modules/videos/constant";
 import { CategoryNames } from "@/script/seedCategory";
 import { SearchIcon, XIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export const SearchInput = () => {
   const router = useRouter();
-  const [query, setQuery] = useState('');
+  const SearchParams = useSearchParams();
 
+  const Query = SearchParams.get("query") || "";
+  const categoryId = SearchParams.get("categoryId") ||  "";
+
+  const [query, setQuery] = useState(Query);
+
+
+  
   const handleSearch = (e: React.FormEvent) => {
-    console.log(query? query : "no");
+  //   console.log(query? query : "no");
     
-    e.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
-    }
-  };
-  //   const url = new URL("/search", APP_URL ? `https://${APP_URL}` : "https://localhost:3000");  
-  //     const newQuery = query.trim();
+  //   e.preventDefault();
 
-  //   url.searchParams.set("query", encodeURIComponent(newQuery))
-
-  //   if(newQuery==""){
-  //     url.searchParams.delete("query")
-  //   } 
-  //   console.log("app url:", APP_URL ? `https://${APP_URL}`: "https://localhost:3000")
-  //   setQuery(newQuery)
-  //   router.push(url.toString())
+  //   if (query.trim()) {
+  //     router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+  //   }
   // };
+    const url = new URL("/search", APP_URL);  
+      const newQuery = query.trim();
+
+    url.searchParams.set("query", encodeURIComponent(newQuery))
+    if(categoryId){
+      url.searchParams.set("categoryId", categoryId)
+    } 
+    if(newQuery==""){
+      url.searchParams.delete("query")
+    } 
+    console.log("app url:", APP_URL)
+    setQuery(newQuery)
+    router.push(url.toString())
+  };
   return (
     <form onSubmit={handleSearch} className="flex w-full mx-[600]">
       <div className="relative w-full">
