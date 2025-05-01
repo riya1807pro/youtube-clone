@@ -1,17 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-<<<<<<< HEAD
-  images:{
-    remotePatterns:[
-      {
-        protocol:'https',
-        hostname: "image.mux.",
-      }
-    ],
-    domains: ["utfs.io"],
-  }
-=======
   /* config options here */
 
   images: {
@@ -26,7 +15,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
->>>>>>> 9f21a4b (internal structure improvements)
 };
 
 export default nextConfig;

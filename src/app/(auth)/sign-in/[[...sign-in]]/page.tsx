@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import { SignIn } from '@clerk/nextjs'
-
-export default function Page() {
-  return <SignIn />
-}
-=======
 import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
@@ -14,4 +7,3 @@ export default function Page() {
     </div>
   );
 }
->>>>>>> 9f21a4b (internal structure improvements)
